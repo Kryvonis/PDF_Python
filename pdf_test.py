@@ -48,13 +48,13 @@ c = canvas.Canvas("hello.pdf", pagesize=(1562, 221 * mm))
 c.drawString(226, 110, "Hello")
 hair = Image.open("images/ab_thumb_male_hair_straight.png")
 white_back = Image.open("lalala.png")
-txt = Image.new('RGBA', white_back.size, (255,255,255,0))
+txt = Image.new('RGBA', (200,100), (255,255,255,0))
 d = ImageDraw.Draw(txt)
 font = ImageFont.truetype("arial.ttf",size=20)
-d.text((20,20),"Hello WORLD!",fill=(0,0,0,255),font=font)
+d.text((0,0),"Hello WORLD!",fill=(0,0,0,255),font=font)
 # d.text((20,100),"Hello WORLD2!",fill=(0,0,0,255))
 white_back.paste(hair,(700,20),hair)
-
+txt.save('text1.png')
 # TEXT TRANSFORMATION
 def find_coeffs(pa, pb):
     matrix = []
@@ -69,21 +69,28 @@ def find_coeffs(pa, pb):
     return numpy.array(res).reshape(8)
 
 width, height = txt.size
-m = -0.5
+m = 0.5
 xshift = abs(m) * width
 new_width = width + int(round(xshift))
-txt = txt.transform((new_width, height), Image.AFFINE,
-        (1, m, -xshift if m > 0 else 0, 0, 1, 0), Image.BICUBIC)
-# img.save(sys.argv[2])
+coeffs = find_coeffs(
+    [(0,0),(300,0),(300,100),(0,100)],
+    [(0,0),(300,0),(new_width,height),(xshift,height)],
 
-white_back.paste(txt,(0,0),txt)
+)
+txt = txt.transform((new_width, height), Image.AFFINE,
+        coeffs, Image.BICUBIC)
+# img.save(sys.argv[2])
+txt.save('text.png')
+white_back.paste(txt,(100,0),txt)
 white_back.save('LOL.png')
 c.showPage()
 c.drawImage("LOL.png", 0, 0)
 c.showPage()
-c.drawImage("images/ab_skin_1.png", 700, 300)
-c.showPage()
-c.save()
+# c.drawImage("images/ab_skin_1.png", 700, 300)
+# c.showPage()
+# ##################
+# ##################
+# c.save()
 
 # #
 # #
