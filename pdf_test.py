@@ -34,10 +34,10 @@
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Image
 from reportlab.lib.units import inch, mm
-from PIL import Image,ImageChops,ImageDraw,ImagePath,ImageFont
+from PIL import Image as IMG,ImageChops,ImageDraw,ImagePath,ImageFont
 import numpy
-
-c = canvas.Canvas("hello.pdf", pagesize=(1562, 221 * mm))
+import matplotlib.pyplot as plt
+# c = canvas.Canvas("hello.pdf", pagesize=(1562, 221 * mm))
 # logo = "images/1.png"
 # logo_width,logo_height = 1043,445
 # image = Image(logo,logo_width,logo_height)
@@ -45,54 +45,86 @@ c = canvas.Canvas("hello.pdf", pagesize=(1562, 221 * mm))
 # c.drawImage(image,0,0)
 # hello(c)
 
-c.drawString(226, 110, "Hello")
-hair = Image.open("images/ab_thumb_male_hair_straight.png")
-white_back = Image.open("lalala.png")
-txt = Image.new('RGBA', (200,100), (255,255,255,0))
-d = ImageDraw.Draw(txt)
-font = ImageFont.truetype("arial.ttf",size=20)
-d.text((0,0),"Hello WORLD!",fill=(0,0,0,255),font=font)
-# d.text((20,100),"Hello WORLD2!",fill=(0,0,0,255))
-white_back.paste(hair,(700,20),hair)
-txt.save('text1.png')
-# TEXT TRANSFORMATION
-def find_coeffs(pa, pb):
-    matrix = []
-    for p1, p2 in zip(pa, pb):
-        matrix.append([p1[0], p1[1], 1, 0, 0, 0, -p2[0]*p1[0], -p2[0]*p1[1]])
-        matrix.append([0, 0, 0, p1[0], p1[1], 1, -p2[1]*p1[0], -p2[1]*p1[1]])
+from reportlab.platypus import SimpleDocTemplate, Image
+doc = SimpleDocTemplate("image.pdf", pagesize=(1562,221*mm))
+parts = []
+page = IMG.open("images/4.png")
+page.convert('CMYK')
+parts.append(Image('images/4.png'))
+parts.append(Image('images/ab_skin_1.png'))
+parts.append(page)
+doc.build(parts)
 
-    A = numpy.matrix(matrix, dtype=numpy.float)
-    B = numpy.array(pb).reshape(8)
 
-    res = numpy.dot(numpy.linalg.inv(A.T * A) * A.T, B)
-    return numpy.array(res).reshape(8)
-
-width, height = txt.size
-m = 0.5
-xshift = abs(m) * width
-new_width = width + int(round(xshift))
-coeffs = find_coeffs(
-    [(0,0),(300,0),(300,100),(0,100)],
-    [(0,0),(300,0),(new_width,height),(xshift,height)],
-
-)
-txt = txt.transform((new_width, height), Image.AFFINE,
-        coeffs, Image.BICUBIC)
-# img.save(sys.argv[2])
-txt.save('text.png')
-white_back.paste(txt,(100,0),txt)
-white_back.save('LOL.png')
-c.showPage()
-c.drawImage("LOL.png", 0, 0)
-c.showPage()
-# c.drawImage("images/ab_skin_1.png", 700, 300)
+# ############################################
+#
+#
+# c.drawString(226, 110, "Hello")
+# hair = Image.open("images/ab_thumb_male_hair_straight.png")
+# page = Image.open("images/4.png")
+# page.convert('CMYK')
+# c.drawImage(page,x=0,y=0)
 # c.showPage()
-# ##################
-# ##################
+# white_back = Image.open("lalala.png")
+# txt = Image.new('RGBA', (700,200), (100,100,100,0))
+#
+# d = ImageDraw.Draw(txt)
+# font = ImageFont.truetype("arial.ttf",size=100)
+# d.text((20,100),"Hello WORLD!",fill=(0,0,0,255),font=font)
+#
+# d.point((28,119),fill=(255,0,0,255))
+# d.point((672,119),fill=(255,0,0,255))
+# d.point((672,190),fill=(255,0,0,255))
+# d.point((28,190),fill=(255,0,0,255))
+# # d.text((20,100),"Hello WORLD2!",fill=(0,0,0,255))
+# white_back.paste(hair,(700,20),hair)
+# txt.save('text_original.jpeg')
+# # TEXT TRANSFORMATION
+# def find_coeffs(pa, pb):
+#     matrix = []
+#     for p1, p2 in zip(pa, pb):
+#         matrix.append([p1[0], p1[1], 1, 0, 0, 0, -p2[0]*p1[0], -p2[0]*p1[1]])
+#         matrix.append([0, 0, 0, p1[0], p1[1], 1, -p2[1]*p1[0], -p2[1]*p1[1]])
+#     A = numpy.matrix(matrix, dtype=numpy.float)
+#     B = numpy.array(pb).reshape(8)
+#     res = numpy.dot(numpy.linalg.inv(A.T * A) * A.T, B)
+#     return numpy.array(res).reshape(8)
+#
+# coeffs = find_coeffs(
+#     [(28,119),(672,119),(672,190),(28,190)],
+#     [(0,0),(700,0),(700,200),(0,200)],
+# )
+# # txt = txt.transform((new_width, height), Image.AFFINE,
+# #         coeffs, Image.BICUBIC)
+# # # img.save(sys.argv[2])
+# txt = txt.transform((700, 200), Image.AFFINE,
+#         coeffs, Image.NEAREST)
+# # img.save(sys.argv[2])
+# plt.imshow(txt)
+# txt.save('text.png')
+# coeffs = find_coeffs(
+#     [(0,0),(680,0),(660,100),(0,100)],
+#     [(0,0),(680,0),(680,50),(0,100)],
+#
+# )
+# # txt = txt.transform((new_width, height), Image.AFFINE,
+# #         coeffs, Image.BICUBIC)
+# # # img.save(sys.argv[2])
+# txt = txt.transform((700, 200), Image.AFFINE,
+#         coeffs, Image.BICUBIC)
+# txt.save('text1.png')
+# white_back.paste(txt,(100,0),txt)
+# white_back.save('LOL.png')
+# c.showPage()
+# c.drawImage("LOL.png", 0, 0)
+# c.showPage()
+# # c.drawImage("images/ab_skin_1.png", 700, 300)
+# # c.showPage()
+# # ##################
+# # ##################
 # c.save()
-
-# #
+#
+# # #############################################
 # #
 # # # from PyPDF2 import PdfFileWriter, PdfFileReader
 # # # output = PdfFileWriter()
